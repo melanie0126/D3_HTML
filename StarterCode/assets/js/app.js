@@ -1,4 +1,6 @@
 // @TODO: YOUR CODE HERE!
+console.log("JS code starts")
+
 var svgWidth = 960;
 var svgHeight = 500;
 
@@ -11,9 +13,9 @@ var margin = {
 
 var width = svgWidth - margin.left - margin.right;
 var height = svgHeight - margin.top - margin.bottom;
-
+console.log("height:",height)
 // Create an SVG wrapper, append an SVG group that will hold our chart, and shift the latter by left and top margins.
-var svg = d3.select(".chart")
+var svg = d3.select("#scatter")
   .append("svg")
   .attr("width", svgWidth)
   .attr("height", svgHeight);
@@ -22,25 +24,25 @@ var chartGroup = svg.append("g")
   .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
 // Import Data
-d3.csv("/data/data.csv").then(function(csData) {
-
+d3.csv("assets/data/data.csv").then(function(csData) {
+    console.log(csData)
     // Step 1: Parse Data/Cast as numbers
     // ==============================
     csData.forEach(function(data) {
       data.poverty = +data.poverty;
       data.healthcare = +data.healthcare;
     });
-
+    console.log(csData)
     // Step 2: Create scale functions
     // ==============================
     var xLinearScale = d3.scaleLinear()
-      .domain([20, d3.max(csData, d => d.hair_length)])
+      .domain([d3.min(csData,d =>d.poverty), d3.max(csData, d => d.poverty)])
       .range([0, width]);
 
     var yLinearScale = d3.scaleLinear()
-      .domain([0, d3.max(csData, d => d.num_hits)])
+      .domain([0, d3.max(csData, d => d.healthcare)])
       .range([height, 0]);
-
+      
     // Step 3: Create axis functions
     // ==============================
     var bottomAxis = d3.axisBottom(xLinearScale);
@@ -72,7 +74,7 @@ d3.csv("/data/data.csv").then(function(csData) {
     // ==============================
     var toolTip = d3.tip()
       .attr("class", "tooltip")
-      .offset([80, -60])
+      .offset([60, 15])
       .html(function(d) {
         return (`${d.state}<br>Poverty Percentage: ${d.poverty}<br>Lacks Healthcare Percentage: ${d.healthcare}`);
       });
@@ -83,8 +85,9 @@ d3.csv("/data/data.csv").then(function(csData) {
 
     // Step 8: Create event listeners to display and hide the tooltip
     // ==============================
-    circlesGroup.on("click", function(data) {
+    circlesGroup.on("mouseover", function(data) {
       toolTip.show(data, this);
+      console.log("mouseover")
     })
       // onmouseout event
       .on("mouseout", function(data, index) {
